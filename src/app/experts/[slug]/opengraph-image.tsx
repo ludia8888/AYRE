@@ -129,9 +129,9 @@ export default async function Image({ params }: ExpertOgProps) {
             }}
           >
             <div style={{ fontSize: "14px", letterSpacing: "0.24em", textTransform: "uppercase", opacity: 0.5 }}>Based on</div>
-            <div style={{ fontSize: "48px", lineHeight: 1 }}>{snapshot.resolvedCount} resolved predictions</div>
+            <div style={{ fontSize: "48px", lineHeight: 1 }}>{`${snapshot.resolvedCount} resolved predictions`}</div>
             <div style={{ fontSize: "16px", letterSpacing: "0.2em", textTransform: "uppercase", opacity: 0.45 }}>
-              Score {snapshot.scoreVersion}
+              {`Score ${snapshot.scoreVersion}`}
             </div>
           </div>
         </div>

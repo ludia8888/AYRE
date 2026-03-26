@@ -170,6 +170,24 @@ function slugify(value: string) {
     .replace(/^-+|-+$/g, "");
 }
 
+function sanitizeForFirestore<T>(value: T): T {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => sanitizeForFirestore(item))
+      .filter((item) => item !== undefined) as T;
+  }
+
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value)
+        .filter(([, entryValue]) => entryValue !== undefined)
+        .map(([key, entryValue]) => [key, sanitizeForFirestore(entryValue)]),
+    ) as T;
+  }
+
+  return value;
+}
+
 function inferPlatformFromUrl(value: string) {
   try {
     return new URL(value).hostname.replace(/^www\./, "");
@@ -457,7 +475,7 @@ export async function refreshPublicArtifacts(): Promise<PublicRefreshResult> {
   for (const group of chunk(operations, 400)) {
     const batch = db.batch();
     for (const operation of group) {
-      batch.set(db.collection(operation.collection).doc(operation.id), operation.data, { merge: true });
+      batch.set(db.collection(operation.collection).doc(operation.id), sanitizeForFirestore(operation.data), { merge: true });
     }
     await batch.commit();
   }
@@ -496,7 +514,7 @@ export async function saveExpert(input: ExpertInput) {
     },
   };
 
-  await db.collection("experts").doc(expert.id).set(expert, { merge: true });
+  await db.collection("experts").doc(expert.id).set(sanitizeForFirestore(expert), { merge: true });
   await refreshPublicArtifacts();
 
   return expert;
@@ -532,8 +550,8 @@ export async function createClaim(input: ClaimInput) {
   const claim = buildClaimRecord(input, dataset, sourceDocument.id, `claim-${randomUUID()}`);
 
   const batch = db.batch();
-  batch.set(db.collection("source_documents").doc(sourceDocument.id), sourceDocument);
-  batch.set(db.collection("claims").doc(claim.id), claim);
+  batch.set(db.collection("source_documents").doc(sourceDocument.id), sanitizeForFirestore(sourceDocument));
+  batch.set(db.collection("claims").doc(claim.id), sanitizeForFirestore(claim));
   await batch.commit();
 
   if (claim.status !== "review" && claim.status !== "draft") {
@@ -569,7 +587,7 @@ export async function updateClaimWorkflow(input: ClaimWorkflowUpdateInput) {
     scoreVersion: dataset.activeScoreVersion.version,
   };
 
-  await db.collection("claims").doc(input.id).set(patch, { merge: true });
+  await db.collection("claims").doc(input.id).set(sanitizeForFirestore(patch), { merge: true });
   await refreshPublicArtifacts();
 
   return {
@@ -610,14 +628,14 @@ export async function upsertResolution(input: ResolutionInput) {
   };
 
   const batch = db.batch();
-  batch.set(db.collection("resolutions").doc(resolution.id), resolution, { merge: true });
+  batch.set(db.collection("resolutions").doc(resolution.id), sanitizeForFirestore(resolution), { merge: true });
   batch.set(
     db.collection("claims").doc(claim.id),
-    {
+    sanitizeForFirestore({
       status: "resolved",
       reviewedBy: input.reviewerId,
       reviewedAt: new Date().toISOString(),
-    } satisfies Partial<Claim>,
+    } satisfies Partial<Claim>),
     { merge: true },
   );
   await batch.commit();
@@ -638,16 +656,16 @@ export async function saveCorrection(input: CorrectionInput) {
   };
 
   const batch = db.batch();
-  batch.set(db.collection("corrections").doc(correction.id), correction, { merge: true });
+  batch.set(db.collection("corrections").doc(correction.id), sanitizeForFirestore(correction), { merge: true });
 
   if (input.claimId && input.linkedClaimStatus) {
     batch.set(
       db.collection("claims").doc(input.claimId),
-      {
+      sanitizeForFirestore({
         status: input.linkedClaimStatus,
         reviewedAt: new Date().toISOString(),
         reviewedBy: "ops-admin",
-      } satisfies Partial<Claim>,
+      } satisfies Partial<Claim>),
       { merge: true },
     );
   }
@@ -688,7 +706,7 @@ export async function createCandidateScoringVersion(input: ScoringVersionInput) 
     changelogSummary: normalizeText(input.changelogSummary),
   };
 
-  await db.collection("scoring_versions").doc(version.id).set(version);
+  await db.collection("scoring_versions").doc(version.id).set(sanitizeForFirestore(version));
   return version;
 }
 
@@ -712,11 +730,11 @@ export async function activateScoringVersion(versionId: string) {
 
     batch.set(
       db.collection("scoring_versions").doc(version.id),
-      {
+      sanitizeForFirestore({
         status: nextStatus,
         activatedAt: version.id === versionId ? nowIso : version.activatedAt,
         highlightUntil: version.id === versionId ? highlightUntil : version.highlightUntil,
-      } satisfies Partial<ScoringVersion>,
+      } satisfies Partial<ScoringVersion>),
       { merge: true },
     );
   }
@@ -724,16 +742,16 @@ export async function activateScoringVersion(versionId: string) {
   for (const claim of dataset.claims) {
     batch.set(
       db.collection("claims").doc(claim.id),
-      {
+      sanitizeForFirestore({
         scoreVersion: target.version,
-      } satisfies Partial<Claim>,
+      } satisfies Partial<Claim>),
       { merge: true },
     );
   }
 
   const changelogId = `changelog-${randomUUID()}`;
 
-  batch.set(db.collection("methodology_changelog").doc(changelogId), {
+  batch.set(db.collection("methodology_changelog").doc(changelogId), sanitizeForFirestore({
     id: changelogId,
     version: target.version,
     publishedAt: nowIso,
@@ -744,7 +762,7 @@ export async function activateScoringVersion(versionId: string) {
       `Shrinkage K ${target.shrinkageK}`,
       `Tier map ${target.tierMap.low}/${target.tierMap.medium}/${target.tierMap.high}`,
     ],
-  });
+  }));
 
   await batch.commit();
   await refreshPublicArtifacts();
@@ -835,8 +853,8 @@ export async function commitImportRows(rows: ParsedImportRow[]) {
   for (const group of chunk(drafts, 150)) {
     const batch = db.batch();
     for (const item of group) {
-      batch.set(db.collection("source_documents").doc(item.sourceDocument.id), item.sourceDocument);
-      batch.set(db.collection("claims").doc(item.claim.id), item.claim);
+      batch.set(db.collection("source_documents").doc(item.sourceDocument.id), sanitizeForFirestore(item.sourceDocument));
+      batch.set(db.collection("claims").doc(item.claim.id), sanitizeForFirestore(item.claim));
     }
     await batch.commit();
   }
@@ -870,7 +888,7 @@ export async function commitExtractCandidates(input: ExtractCommitInput) {
   };
 
   const batch = db.batch();
-  batch.set(db.collection("source_documents").doc(sourceDocument.id), sourceDocument);
+  batch.set(db.collection("source_documents").doc(sourceDocument.id), sanitizeForFirestore(sourceDocument));
 
   for (const candidate of approved) {
     const claim = buildClaimRecord(
@@ -908,7 +926,7 @@ export async function commitExtractCandidates(input: ExtractCommitInput) {
       `claim-${randomUUID()}`,
     );
 
-    batch.set(db.collection("claims").doc(claim.id), claim);
+    batch.set(db.collection("claims").doc(claim.id), sanitizeForFirestore(claim));
   }
 
   await batch.commit();

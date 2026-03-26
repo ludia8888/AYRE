@@ -4,8 +4,6 @@ import { getStorage } from "firebase-admin/storage";
 
 import { isFirebaseAdminConfigured } from "@/lib/firebase/config";
 
-let firestoreConfigured = false;
-
 function getAdminApp() {
   if (!isFirebaseAdminConfigured()) {
     return null;
@@ -31,14 +29,8 @@ export function getFirebaseAdminServices() {
     return null;
   }
 
-  const db = getFirestore(app);
-  if (!firestoreConfigured) {
-    db.settings({ ignoreUndefinedProperties: true });
-    firestoreConfigured = true;
-  }
-
   return {
-    db,
+    db: getFirestore(app),
     storage: getStorage(app),
   };
 }

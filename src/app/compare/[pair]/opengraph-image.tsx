@@ -68,10 +68,12 @@ export default async function Image({ params }: CompareOgProps) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
             <div style={{ fontSize: "18px", letterSpacing: "0.3em", textTransform: "uppercase", color: "#00d68f" }}>AYRE compare</div>
-            <div style={{ fontSize: "60px", textTransform: "uppercase", lineHeight: 1 }}>{compare.left.expert.displayName} vs {compare.right.expert.displayName}</div>
+            <div style={{ fontSize: "60px", textTransform: "uppercase", lineHeight: 1 }}>
+              {`${compare.left.expert.displayName} vs ${compare.right.expert.displayName}`}
+            </div>
           </div>
           <div style={{ fontSize: "18px", letterSpacing: "0.22em", textTransform: "uppercase", opacity: 0.52 }}>
-            Score {compare.scoreVersion}
+            {`Score ${compare.scoreVersion}`}
           </div>
         </div>
 
@@ -119,7 +121,7 @@ export default async function Image({ params }: CompareOgProps) {
                   </div>
                   <div style={{ display: "flex", flexDirection: "column" }}>
                     <span style={{ fontSize: "38px", textTransform: "uppercase", lineHeight: 1 }}>{snapshot.expert.displayName}</span>
-                    <span style={{ fontSize: "16px", opacity: 0.58 }}>Based on {snapshot.resolvedCount} resolved predictions</span>
+                    <span style={{ fontSize: "16px", opacity: 0.58 }}>{`Based on ${snapshot.resolvedCount} resolved predictions`}</span>
                   </div>
                 </div>
                 <div style={{ display: "flex", alignItems: "baseline", gap: "10px" }}>
@@ -147,7 +149,7 @@ export default async function Image({ params }: CompareOgProps) {
             <span style={{ fontSize: "34px", textTransform: "uppercase", lineHeight: 1.05 }}>{compare.representativeCall}</span>
           </div>
           <div style={{ fontSize: "22px", letterSpacing: "0.18em", textTransform: "uppercase", opacity: 0.68 }}>
-            Delta {compare.scoreDelta}
+            {`Delta ${compare.scoreDelta}`}
           </div>
         </div>
       </div>
