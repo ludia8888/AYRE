@@ -1,0 +1,64 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null && request.auth.token.admin == true;
+    }
+
+    match /public_experts/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /public_leaderboards/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /public_compares/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /public_cards/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /experts/{document=**} {
+      allow read, write: if isAdmin();
+    }
+
+    match /source_documents/{document=**} {
+      allow read, write: if isAdmin();
+    }
+
+    match /claims/{document=**} {
+      allow read, write: if isAdmin();
+    }
+
+    match /resolutions/{document=**} {
+      allow read, write: if isAdmin();
+    }
+
+    match /scoring_versions/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /source_extraction_jobs/{document=**} {
+      allow read, write: if isAdmin();
+    }
+
+    match /methodology_changelog/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /corrections/{document=**} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+  }
+}

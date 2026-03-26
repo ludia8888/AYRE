@@ -1,0 +1,140 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #060b10;
+  --bg-soft: #0d141c;
+  --panel: rgba(255, 255, 255, 0.04);
+  --panel-strong: rgba(255, 255, 255, 0.08);
+  --line: rgba(255, 255, 255, 0.1);
+  --line-strong: rgba(255, 255, 255, 0.18);
+  --text: #f3f7fb;
+  --muted: rgba(243, 247, 251, 0.68);
+  --brand-green: #00d68f;
+  --brand-green-soft: rgba(0, 214, 143, 0.14);
+  --brand-red: #f7496d;
+  --brand-red-soft: rgba(247, 73, 109, 0.14);
+  --brand-yellow: #ffca52;
+}
+
+@theme inline {
+  --color-app: var(--bg);
+  --color-panel: var(--panel);
+  --color-panel-strong: var(--panel-strong);
+  --color-brand-green: var(--brand-green);
+  --color-brand-red: var(--brand-red);
+  --font-display: var(--font-display);
+  --font-mono: var(--font-mono);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background:
+    radial-gradient(circle at top, rgba(0, 214, 143, 0.08), transparent 22%),
+    radial-gradient(circle at 85% 15%, rgba(247, 73, 109, 0.1), transparent 18%),
+    linear-gradient(180deg, #03070b, #060b10 32%, #081018);
+}
+
+body {
+  margin: 0;
+  color: var(--text);
+  font-family: var(--font-display), sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+.ayre-panel {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  backdrop-filter: blur(24px);
+  border-radius: 1.5rem;
+}
+
+.ayre-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  border-radius: 999px;
+  padding: 0.95rem 1.2rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background-color 160ms ease;
+}
+
+.ayre-button:hover {
+  transform: translateY(-1px);
+}
+
+.ayre-button-primary {
+  border: 1px solid rgba(0, 214, 143, 0.4);
+  background: linear-gradient(180deg, rgba(0, 214, 143, 0.2), rgba(0, 214, 143, 0.12));
+  color: white;
+}
+
+.ayre-button-secondary {
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--text);
+}
+
+.ayre-stat {
+  border-radius: 1.25rem;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.02);
+  padding: 1rem;
+}
+
+.ayre-stat span {
+  display: block;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(243, 247, 251, 0.45);
+}
+
+.ayre-stat strong {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 1.05rem;
+  font-weight: 500;
+}
+
+.ayre-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 26px 26px;
+}
+
+.ayre-input {
+  width: 100%;
+  border-radius: 1rem;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+  color: white;
+  padding: 0.9rem 1rem;
+}
+
+.ayre-input:focus {
+  outline: 2px solid rgba(0, 214, 143, 0.35);
+  outline-offset: 1px;
+}
