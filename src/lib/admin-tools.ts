@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import type { ExtractedClaimCandidate, ExtractSourcePreview, ImportPreviewRow } from "@/lib/types";
 
-const importRowSchema = z.object({
+export const importRowSchema = z.object({
   expertSlug: z.string().min(1),
   sourceUrl: z.string().url(),
   quote: z.string().min(10),
@@ -13,6 +13,8 @@ const importRowSchema = z.object({
   predictedOutcome: z.enum(["yes", "no"]),
   deadline: z.string().min(4),
 });
+
+export type ParsedImportRow = z.infer<typeof importRowSchema>;
 
 function inferClaimType(text: string): ExtractedClaimCandidate["llmSuggestedClaimType"] {
   const normalized = text.toLowerCase();
@@ -123,7 +125,26 @@ export function extractClaimCandidates(input: string): ExtractedClaimCandidate[]
   });
 }
 
-export function buildImportPreview(text: string, format: "csv" | "json"): ImportPreviewRow[] {
+export function parseImportRows(text: string, format: "csv" | "json") {
+  return (
+    format === "json"
+      ? (JSON.parse(text) as Record<string, string>[])
+      : Papa.parse<Record<string, string>>(text, { header: true, skipEmptyLines: true }).data
+  ).map((row) => importRowSchema.safeParse(row));
+}
+
+function normalizeQuote(value: string) {
+  return value.trim().replace(/\s+/g, " ").toLowerCase();
+}
+
+export function buildImportPreview(
+  text: string,
+  format: "csv" | "json",
+  options?: {
+    expertSlugs?: Set<string>;
+    duplicateKeys?: Set<string>;
+  },
+): ImportPreviewRow[] {
   const rows =
     format === "json"
       ? (JSON.parse(text) as Record<string, string>[])
@@ -131,10 +152,23 @@ export function buildImportPreview(text: string, format: "csv" | "json"): Import
 
   return rows.map((row, index) => {
     const result = importRowSchema.safeParse(row);
+    const errors = result.success ? [] : result.error.issues.map((issue) => `${issue.path.join(".")}: ${issue.message}`);
+
+    if (result.success && options?.expertSlugs && !options.expertSlugs.has(result.data.expertSlug)) {
+      errors.push(`expertSlug: Unknown expert slug "${result.data.expertSlug}"`);
+    }
+
+    if (result.success && options?.duplicateKeys) {
+      const duplicateKey = `${result.data.expertSlug}::${result.data.sourceUrl}::${normalizeQuote(result.data.quote)}`;
+      if (options.duplicateKeys.has(duplicateKey)) {
+        errors.push("duplicate: A claim with the same expert, source URL, and quote already exists.");
+      }
+    }
+
     return {
       rowNumber: index + 1,
-      status: result.success ? "valid" : "invalid",
-      errors: result.success ? [] : result.error.issues.map((issue) => `${issue.path.join(".")}: ${issue.message}`),
+      status: errors.length === 0 ? "valid" : "invalid",
+      errors,
       preview: row,
     };
   });

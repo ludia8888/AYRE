@@ -1,10 +1,10 @@
-import "server-only";
-
 import { cert, getApp, getApps, initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 import { getStorage } from "firebase-admin/storage";
 
 import { isFirebaseAdminConfigured } from "@/lib/firebase/config";
+
+let firestoreConfigured = false;
 
 function getAdminApp() {
   if (!isFirebaseAdminConfigured()) {
@@ -31,8 +31,14 @@ export function getFirebaseAdminServices() {
     return null;
   }
 
+  const db = getFirestore(app);
+  if (!firestoreConfigured) {
+    db.settings({ ignoreUndefinedProperties: true });
+    firestoreConfigured = true;
+  }
+
   return {
-    db: getFirestore(app),
+    db,
     storage: getStorage(app),
   };
 }

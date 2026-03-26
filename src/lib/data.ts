@@ -1,4 +1,4 @@
-import { cache } from "react";
+import { unstable_noStore as noStore } from "next/cache";
 
 import { getFirebaseAdminServices } from "@/lib/firebase/server";
 import { mockSiteDataset } from "@/lib/mock-data";
@@ -10,6 +10,8 @@ import type {
 } from "@/lib/types";
 
 async function fetchFirestoreDataset(): Promise<SiteDataset | null> {
+  noStore();
+
   const services = getFirebaseAdminServices();
   if (!services) {
     return null;
@@ -44,14 +46,14 @@ async function fetchFirestoreDataset(): Promise<SiteDataset | null> {
   };
 }
 
-export const getSiteDataset = cache(async () => {
+export async function getSiteDataset() {
   return (await fetchFirestoreDataset()) ?? mockSiteDataset;
-});
+}
 
-export const getExpertBySlug = cache(async (slug: string) => {
+export async function getExpertBySlug(slug: string) {
   const dataset = await getSiteDataset();
   return dataset.experts.find((expert) => expert.slug === slug) ?? null;
-});
+}
 
 export async function getExpertSnapshotBySlug(slug: string, window: WindowKey = "all") {
   const dataset = await getSiteDataset();

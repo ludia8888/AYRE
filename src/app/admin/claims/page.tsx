@@ -1,4 +1,5 @@
 import { AdminShell } from "@/components/admin-shell";
+import { ClaimsManager } from "@/components/admin/claims-manager";
 import { getSiteDataset } from "@/lib/data";
 
 export default async function AdminClaimsPage() {
@@ -25,18 +26,7 @@ export default async function AdminClaimsPage() {
           <strong>{dataset.claims.filter((claim) => claim.status === "published_awaiting_data").length}</strong>
         </div>
       </div>
-
-      <div className="ayre-panel p-6">
-        <p className="font-display text-4xl uppercase text-white">Recent rejected examples</p>
-        <div className="mt-5 grid gap-3">
-          {rejected.map((claim) => (
-            <div key={claim.id} className="rounded-2xl border border-white/10 bg-white/4 p-4">
-              <p className="font-display text-2xl uppercase text-white">{claim.eventLabel}</p>
-              <p className="mt-2 text-sm text-white/64">{claim.rejectionReason}</p>
-            </div>
-          ))}
-        </div>
-      </div>
+      <ClaimsManager experts={dataset.experts} claims={dataset.claims} sourceDocuments={dataset.sourceDocuments} />
     </AdminShell>
   );
 }
