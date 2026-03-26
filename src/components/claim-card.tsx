@@ -21,86 +21,97 @@ export function ClaimCard({
   const resolvedRecord = "claim" in record ? record : undefined;
 
   return (
-    <article className="ayre-panel space-y-4 p-5">
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="rounded-full border border-white/10 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.28em] text-white/55">
+    <article className="ayre-panel space-y-4 p-5 transition hover:shadow-md">
+      <div className="flex flex-wrap items-center gap-1.5">
+        <span className="rounded border border-[var(--border)] px-2 py-0.5 font-mono text-[8px] uppercase tracking-[0.16em] text-[var(--muted)]">
           {formatClaimStatus(claim.status)}
         </span>
         <span
-          className={`rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.28em] ${
+          className={`rounded border px-2 py-0.5 font-mono text-[8px] uppercase tracking-[0.16em] ${
             claim.predictedOutcome === "yes"
-              ? "border-brand-green/30 bg-brand-green/10 text-brand-green"
-              : "border-brand-red/30 bg-brand-red/10 text-brand-red"
+              ? "border-brand-green/30 bg-brand-green/5 text-brand-green"
+              : "border-brand-red/20 bg-brand-red/5 text-brand-red"
           }`}
         >
-          Call: {formatPredictionDirection(claim)}
+          {formatPredictionDirection(claim)}
         </span>
         {claim.confidenceTier ? (
-          <span className="rounded-full border border-white/10 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.28em] text-white/45">
-            {claim.confidenceTier} conviction
+          <span className="rounded border border-[var(--border)] px-2 py-0.5 font-mono text-[8px] uppercase tracking-[0.16em] text-[var(--dim)]">
+            {claim.confidenceTier}
           </span>
         ) : null}
       </div>
-      <div className="space-y-2">
-        <p className="font-display text-3xl uppercase leading-none text-white">{claim.eventLabel}</p>
-        <blockquote className="border-l border-white/10 pl-4 text-sm leading-6 text-white/72">“{claim.quotedText}”</blockquote>
+
+      <div className="space-y-3">
+        <p className="font-display text-xl font-bold leading-tight tracking-[-0.01em] text-[var(--text)]">{claim.eventLabel}</p>
+        <blockquote className="relative rounded-lg bg-[var(--bg)] p-5">
+          <span className="absolute -top-2 left-4 font-serif text-4xl leading-none text-brand-green/30">&ldquo;</span>
+          <p className="font-serif text-[1.15rem] italic leading-[1.55] text-[var(--text-secondary)]">
+            {claim.quotedText}
+          </p>
+        </blockquote>
       </div>
-      <div className="grid gap-4 text-sm text-white/62 md:grid-cols-2">
-        <div>
-          <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/40">Published</p>
-          <p>{formatDate(claim.publishedAt)}</p>
-        </div>
-        <div>
-          <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/40">Deadline</p>
-          <p>{formatDate(claim.deadline)}</p>
-        </div>
-        {resolvedRecord ? (
-          <>
-            <div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/40">Brier</p>
-              <p>{resolvedRecord.brier.toFixed(3)}</p>
-            </div>
-            <div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/40">Probability of event</p>
-              <p>{formatPercent(resolvedRecord.probability * 100, 0)}</p>
-            </div>
-            <div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/40">Settlement</p>
-              <p>
-                {formatSettlementPolicy(resolvedRecord.resolution.settlementPolicy)} •{" "}
-                {formatResolutionStage(resolvedRecord.resolution.settledStage)}
-              </p>
-            </div>
-            {resolvedRecord.resolution.revisedValue ? (
-              <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/40">Tracked revision</p>
-                <p>
-                  {resolvedRecord.resolution.revisedValue}
-                  {resolvedRecord.resolution.revisedAt ? ` on ${formatDate(resolvedRecord.resolution.revisedAt)}` : ""}
-                </p>
-              </div>
-            ) : null}
-          </>
-        ) : null}
+
+      <div className="grid gap-1.5 text-xs md:grid-cols-2">
+        {[
+          { label: "Published", value: formatDate(claim.publishedAt) },
+          { label: "Deadline", value: formatDate(claim.deadline) },
+          ...(resolvedRecord
+            ? [
+                { label: "Brier", value: resolvedRecord.brier.toFixed(3), bold: true },
+                { label: "Probability", value: formatPercent(resolvedRecord.probability * 100, 0) },
+                {
+                  label: "Settlement",
+                  value: `${formatSettlementPolicy(resolvedRecord.resolution.settlementPolicy)} • ${formatResolutionStage(resolvedRecord.resolution.settledStage)}`,
+                  full: true,
+                },
+                ...(resolvedRecord.resolution.revisedValue
+                  ? [
+                      {
+                        label: "Revision",
+                        value: `${resolvedRecord.resolution.revisedValue}${resolvedRecord.resolution.revisedAt ? ` on ${formatDate(resolvedRecord.resolution.revisedAt)}` : ""}`,
+                        full: true,
+                      },
+                    ]
+                  : []),
+              ]
+            : []),
+        ].map((item) => (
+          <div
+            key={item.label}
+            className={`flex items-baseline justify-between rounded-md bg-[var(--bg)] px-3 py-2 ${"full" in item && item.full ? "md:col-span-2" : ""}`}
+          >
+            <span className="font-mono text-[7px] uppercase tracking-[0.2em] text-[var(--dim)]">{item.label}</span>
+            <span className={`${"bold" in item && item.bold ? "font-bold text-[var(--text)]" : "text-[var(--text-secondary)]"}`}>
+              {item.value}
+            </span>
+          </div>
+        ))}
       </div>
+
       {resolvedRecord?.resolution.revisionNotes ? (
-        <div className="rounded-2xl border border-white/10 bg-white/4 p-4 text-sm text-white/62">
+        <div className="rounded-md bg-[var(--bg)] p-3 font-serif text-sm italic text-[var(--text-secondary)]">
           {resolvedRecord.resolution.revisionNotes}
         </div>
       ) : null}
-      <div className="flex flex-wrap gap-3 font-mono text-[11px] uppercase tracking-[0.2em] text-white/55">
+
+      <div className="flex flex-wrap gap-1.5">
         {source ? (
-          <Link href={source.url} target="_blank" className="rounded-full border border-white/10 px-3 py-2 hover:border-white/20">
-            Source link
+          <Link
+            href={source.url}
+            target="_blank"
+            className="ayre-link rounded-md border border-[var(--border)] px-3 py-1 font-mono text-[8px] uppercase tracking-[0.14em] text-[var(--muted)] transition hover:border-brand-green hover:text-brand-green"
+          >
+            Source
           </Link>
         ) : null}
         {resolvedRecord ? (
           <Link
             href={resolvedRecord.resolution.evidenceUrl}
             target="_blank"
-            className="rounded-full border border-white/10 px-3 py-2 hover:border-white/20"
+            className="ayre-link rounded-md border border-[var(--border)] px-3 py-1 font-mono text-[8px] uppercase tracking-[0.14em] text-[var(--muted)] transition hover:border-brand-green hover:text-brand-green"
           >
-            Evidence link
+            Evidence
           </Link>
         ) : null}
       </div>

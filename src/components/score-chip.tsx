@@ -3,30 +3,43 @@ import clsx from "clsx";
 import type { ExpertSnapshot } from "@/lib/types";
 
 export function ScoreChip({ snapshot, compact = false }: { snapshot: ExpertSnapshot; compact?: boolean }) {
+  const isGood = snapshot.ayreScore >= 70;
+  const isBad = snapshot.ayreScore <= 45;
+
   return (
     <div
       className={clsx(
-        "rounded-2xl border px-3 py-2",
-        snapshot.ayreScore >= 70
-          ? "border-brand-green/40 bg-brand-green/10"
-          : snapshot.ayreScore <= 45
-            ? "border-brand-red/40 bg-brand-red/10"
-            : "border-white/10 bg-white/5",
+        "ayre-score-hover rounded-lg border px-4 py-3 transition",
+        isGood ? "ayre-winner" : isBad ? "ayre-loser" : "ayre-neutral",
       )}
     >
       <div className="flex items-center gap-2">
-        <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/55">AYRE</span>
+        <span className="font-mono text-[8px] uppercase tracking-[0.22em] text-[var(--muted)]">AYRE</span>
         {snapshot.provisional ? (
-          <span className="rounded-full border border-brand-yellow/30 bg-[rgba(255,202,82,0.12)] px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--brand-yellow)]">
-            Provisional
+          <span className="rounded border border-[var(--brand-yellow)]/20 bg-[rgba(184,134,11,0.06)] px-1.5 py-px font-mono text-[7px] uppercase tracking-[0.12em] text-[var(--brand-yellow)]">
+            Prov
           </span>
         ) : null}
       </div>
-      <div className="mt-1 flex items-end gap-2">
-        <strong className="font-display text-4xl leading-none text-white">{snapshot.ayreScore}</strong>
-        {!compact ? <span className="pb-1 text-xs text-white/45">Based on {snapshot.resolvedCount}</span> : null}
+      <div className="mt-1 flex items-end gap-1.5">
+        <strong
+          className={clsx(
+            "font-display leading-none tracking-[-0.04em]",
+            compact ? "text-3xl font-extrabold" : "text-[3.5rem] font-extrabold",
+            isGood ? "text-brand-green" : isBad ? "text-brand-red" : "text-[var(--text)]",
+          )}
+        >
+          {snapshot.ayreScore}
+        </strong>
+        {!compact ? (
+          <span className="pb-1 font-mono text-[9px] text-[var(--dim)]">/{snapshot.resolvedCount}</span>
+        ) : null}
       </div>
-      {!compact ? <p className="mt-1 text-xs text-white/55">Score v{snapshot.scoreVersion.replace("v", "")}</p> : null}
+      {!compact ? (
+        <p className="mt-0.5 font-mono text-[8px] tracking-[0.14em] text-[var(--dim)]">
+          SCORE V{snapshot.scoreVersion.replace("v", "")}
+        </p>
+      ) : null}
     </div>
   );
 }

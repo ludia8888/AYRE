@@ -20,9 +20,7 @@ export async function generateMetadata({ params }: ExpertPageProps): Promise<Met
   const snapshot = await getExpertSnapshotBySlug(slug);
 
   if (!snapshot) {
-    return {
-      title: "Expert not found | AYRE",
-    };
+    return { title: "Expert not found | AYRE" };
   }
 
   const ogPath = `/experts/${slug}/opengraph-image?v=${snapshot.scoreVersion}`;
@@ -32,17 +30,8 @@ export async function generateMetadata({ params }: ExpertPageProps): Promise<Met
   return {
     title,
     description,
-    openGraph: {
-      title,
-      description,
-      images: [ogPath],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: [ogPath],
-    },
+    openGraph: { title, description, images: [ogPath] },
+    twitter: { card: "summary_large_image", title, description, images: [ogPath] },
   };
 }
 
@@ -60,68 +49,80 @@ export default async function ExpertPage({ params }: ExpertPageProps) {
   );
 
   return (
-    <div className="space-y-8">
-      <section className="ayre-panel overflow-hidden p-6 md:p-8">
-        <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-          <div className="space-y-4">
-            <p className="font-mono text-xs uppercase tracking-[0.32em] text-brand-green">Profile mode</p>
-            <div>
-              <h1 className="font-display text-5xl uppercase leading-none text-white md:text-6xl">{snapshot.expert.displayName}</h1>
-              <p className="mt-2 text-base text-white/66">{snapshot.expert.headline}</p>
-            </div>
-            <div className="grid gap-4 md:grid-cols-3">
-              <div className="ayre-stat">
-                <span>Accuracy</span>
-                <strong>{snapshot.accuracy.toFixed(1)}%</strong>
+    <div className="space-y-12">
+      {/* ── Profile hero ── */}
+      <section className="animate-fade-up ayre-hero-bg overflow-hidden rounded-xl border border-[var(--border)]">
+        <div className="h-1 bg-gradient-to-r from-brand-green via-brand-green/60 to-transparent" />
+        <div className="p-6 md:p-8">
+          <div className="grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
+            <div className="space-y-5">
+              <div className="flex items-center gap-3">
+                <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-brand-green">Profile</span>
+                <span className="h-px flex-1 bg-[var(--border)]" />
               </div>
-              <div className="ayre-stat">
-                <span>Resolved claims</span>
-                <strong>{snapshot.resolvedCount}</strong>
+              <div>
+                <h1 className="border-l-4 border-brand-green pl-5 font-serif text-[clamp(2.2rem,5vw,4.5rem)] italic leading-[0.95] text-[var(--text)]">
+                  {snapshot.expert.displayName}
+                </h1>
+                <p className="mt-2 text-[15px] text-[var(--muted)]">{snapshot.expert.headline}</p>
               </div>
-              <div className="ayre-stat">
-                <span>Version</span>
-                <strong>{snapshot.scoreVersion}</strong>
+              <div className="grid gap-2 md:grid-cols-3">
+                <div className="ayre-stat">
+                  <span>Accuracy</span>
+                  <strong>{snapshot.accuracy.toFixed(1)}%</strong>
+                </div>
+                <div className="ayre-stat">
+                  <span>Resolved</span>
+                  <strong>{snapshot.resolvedCount}</strong>
+                </div>
+                <div className="ayre-stat">
+                  <span>Version</span>
+                  <strong>{snapshot.scoreVersion}</strong>
+                </div>
+              </div>
+              <div className="flex flex-wrap items-center gap-2 font-mono text-[9px] uppercase tracking-[0.14em] text-[var(--dim)]">
+                <a href={buildTrackedPath(`/experts/${snapshot.expert.slug}`, "expert", snapshot.expert.slug)} className="ayre-link transition hover:text-brand-green">Share URL</a>
+                <span className="text-[var(--border)]">|</span>
+                <a href="/methodology" className="ayre-link transition hover:text-brand-green">Method</a>
+                <span className="text-[var(--border)]">|</span>
+                <a href="/corrections" className="ayre-link transition hover:text-brand-green">Corrections</a>
               </div>
             </div>
-            <div className="flex flex-wrap gap-3 font-mono text-[11px] uppercase tracking-[0.22em] text-white/55">
-              <a href={buildTrackedPath(`/experts/${snapshot.expert.slug}`, "expert", snapshot.expert.slug)}>Tracked share URL</a>
-              <a href="/methodology">Methodology</a>
-              <a href="/corrections">Corrections</a>
-            </div>
-          </div>
-          <div className="space-y-4">
-            <ScoreChip snapshot={snapshot} />
-            <div className="ayre-panel border-white/8 bg-white/3 p-5">
-              <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/45">Best call</p>
-              <p className="mt-2 font-display text-3xl uppercase text-white">
-                {snapshot.bestCall?.claim.eventLabel ?? "No resolved calls yet"}
-              </p>
-              {snapshot.bestCall ? (
-                <p className="mt-2 text-sm text-white/62">
-                  Resolved on {formatDate(snapshot.bestCall.resolution.resolvedAt)} with Brier {snapshot.bestCall.brier.toFixed(3)}.
+            <div className="space-y-3">
+              <ScoreChip snapshot={snapshot} />
+              <div className="rounded-lg border border-brand-green/20 bg-brand-green/[0.03] p-4 transition hover:border-brand-green/30">
+                <p className="font-mono text-[7px] uppercase tracking-[0.2em] text-brand-green">Best call</p>
+                <p className="mt-1.5 font-serif text-lg italic leading-snug text-[var(--text)]">
+                  {snapshot.bestCall?.claim.eventLabel ?? "No resolved calls yet"}
                 </p>
-              ) : null}
-            </div>
-            <div className="ayre-panel border-white/8 bg-white/3 p-5">
-              <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/45">Worst call</p>
-              <p className="mt-2 font-display text-3xl uppercase text-white">
-                {snapshot.worstCall?.claim.eventLabel ?? "No misses yet"}
-              </p>
-              {snapshot.worstCall ? (
-                <p className="mt-2 text-sm text-white/62">
-                  Brier {snapshot.worstCall.brier.toFixed(3)} with published source still linked below.
+                {snapshot.bestCall ? (
+                  <p className="mt-1.5 font-mono text-[10px] text-[var(--muted)]">
+                    {formatDate(snapshot.bestCall.resolution.resolvedAt)} • Brier {snapshot.bestCall.brier.toFixed(3)}
+                  </p>
+                ) : null}
+              </div>
+              <div className="rounded-lg border border-brand-red/12 bg-brand-red/[0.02] p-4 transition hover:border-brand-red/20">
+                <p className="font-mono text-[7px] uppercase tracking-[0.2em] text-brand-red/70">Worst call</p>
+                <p className="mt-1.5 font-serif text-lg italic leading-snug text-[var(--text)]">
+                  {snapshot.worstCall?.claim.eventLabel ?? "No misses yet"}
                 </p>
-              ) : null}
+                {snapshot.worstCall ? (
+                  <p className="mt-1.5 font-mono text-[10px] text-[var(--muted)]">
+                    Brier {snapshot.worstCall.brier.toFixed(3)}
+                  </p>
+                ) : null}
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="space-y-6">
+      {/* ── Resolved calls ── */}
+      <section className="animate-fade-up space-y-6" style={{ animationDelay: "0.1s" }}>
         <SectionHeading
-          eyebrow="Resolved calls"
+          eyebrow="Calls"
           title="Every call stays source-linked"
-          description="Profiles carry the quote, the direction, the evidence link, and the version that scored the call."
+          description="The quote, the direction, the evidence, and the version."
         />
         <div className="grid gap-4 lg:grid-cols-2">
           {recentResolved.map((record) => (

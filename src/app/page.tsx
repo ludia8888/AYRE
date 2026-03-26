@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, BadgeInfo, Radar, Share2, Swords } from "lucide-react";
+import { ArrowRight, Swords } from "lucide-react";
 
 import { ClaimCard } from "@/components/claim-card";
 import { CompareSummaryCard } from "@/components/compare-summary-card";
@@ -17,106 +17,157 @@ export default async function HomePage() {
   ]);
 
   const topSection = leaderboardSections[0];
+  const allExperts = topSection?.rows ?? [];
 
   return (
     <div className="space-y-20 pb-20">
-      <section className="ayre-panel overflow-hidden border-none bg-[radial-gradient(circle_at_top_left,rgba(0,214,143,0.18),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(247,73,109,0.16),transparent_25%),linear-gradient(180deg,rgba(9,16,22,0.95),rgba(9,16,22,0.9))] p-8 md:p-12">
-        <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr]">
-          <div className="space-y-6">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs uppercase tracking-[0.28em] text-white/70">
-              Macro Phase 1
-            </div>
-            <div className="space-y-4">
-              <p className="font-mono text-xs uppercase tracking-[0.3em] text-brand-green">Are you real?</p>
-              <h1 className="max-w-3xl font-display text-5xl uppercase leading-none tracking-tight text-white md:text-7xl">
-                Public calls. Frozen scoring. Brutally legible track records.
-              </h1>
-              <p className="max-w-2xl text-base text-white/72 md:text-lg">
-                AYRE scores macro experts on verifiable public predictions. Every card shows the score, the sample size, the
-                source link, and the score version that produced it.
-              </p>
-            </div>
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <Link href="/leaderboard" className="ayre-button ayre-button-primary">
-                Browse the board
-                <ArrowRight className="size-4" />
-              </Link>
-              {featuredCompare ? (
-                <Link
-                  href={buildTrackedPath(`/compare/${featuredCompare.pair}`, "compare", featuredCompare.pair)}
-                  className="ayre-button ayre-button-secondary"
-                >
-                  Is Dr. Doom real?
-                  <Swords className="size-4" />
-                </Link>
-              ) : null}
-            </div>
-            <div className="grid gap-3 sm:grid-cols-3">
-              <div className="ayre-stat">
-                <span>Public sources only</span>
-                <strong>Source-linked claims</strong>
-              </div>
-              <div className="ayre-stat">
-                <span>Frozen formula</span>
-                <strong>Score v1.0</strong>
-              </div>
-              <div className="ayre-stat">
-                <span>Launch focus</span>
-                <strong>Macro only</strong>
-              </div>
-            </div>
-          </div>
+      {/* ── Hero ── */}
+      <section className="animate-fade-up ayre-hero-bg relative overflow-hidden rounded-xl border border-[var(--border)]">
+        <div className="h-1 bg-gradient-to-r from-brand-green via-brand-green/60 to-transparent" />
 
-          {featuredCompare ? (
-            <CompareSummaryCard compare={featuredCompare} priorityLabel="Featured matchup" />
-          ) : null}
+        <div className="px-6 py-6 md:px-10 md:py-8">
+          <div className="grid gap-8 lg:grid-cols-[1.3fr_0.7fr]">
+            <div className="space-y-5">
+              <div className="space-y-4">
+                <div className="inline-flex items-center gap-2 rounded-full border border-brand-green/20 bg-brand-green/5 px-3 py-1 font-mono text-[9px] uppercase tracking-[0.18em] text-brand-green">
+                  <span className="size-1.5 animate-pulse rounded-full bg-brand-green" />
+                  Macro Phase 1 — Live
+                </div>
+                <h1 className="font-serif text-[clamp(2.8rem,6.5vw,5.5rem)] italic leading-[0.92] text-[var(--text)]">
+                  Are you <span className="not-italic font-display font-extrabold tracking-[-0.04em] text-brand-green">real</span>?
+                </h1>
+                <p className="max-w-md text-[14px] leading-relaxed text-[var(--muted)]">
+                  AYRE scores macro experts on verifiable public predictions. Every card shows the score, the sample size, the
+                  source link, and the score version.
+                </p>
+              </div>
+              <div className="flex flex-col gap-2.5 sm:flex-row">
+                <Link href="/leaderboard" className="ayre-button ayre-button-primary">
+                  Browse the board
+                  <ArrowRight className="size-3.5" />
+                </Link>
+                {featuredCompare ? (
+                  <Link
+                    href={buildTrackedPath(`/compare/${featuredCompare.pair}`, "compare", featuredCompare.pair)}
+                    className="ayre-button ayre-button-secondary"
+                  >
+                    Dr. Doom vs Cathie
+                    <Swords className="size-3.5" />
+                  </Link>
+                ) : null}
+              </div>
+              <div className="grid gap-2 sm:grid-cols-3">
+                {[
+                  { label: "Sources", value: "Public only" },
+                  { label: "Formula", value: "Frozen v1.0" },
+                  { label: "Domain", value: "Macro" },
+                ].map((stat) => (
+                  <div key={stat.label} className="flex items-baseline justify-between rounded-md border border-[var(--border)] bg-[var(--bg)]/60 px-3 py-2 transition hover:border-[var(--border-hover)]">
+                    <span className="font-mono text-[7px] uppercase tracking-[0.2em] text-[var(--dim)]">{stat.label}</span>
+                    <span className="font-display text-sm font-bold tracking-[-0.01em] text-[var(--text)]">{stat.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {featuredCompare ? (
+              <CompareSummaryCard compare={featuredCompare} priorityLabel="Featured matchup" />
+            ) : null}
+          </div>
         </div>
       </section>
 
-      <section className="space-y-6">
+      {/* ── Scrolling ticker ── */}
+      {allExperts.length > 0 ? (
+        <div className="ayre-ticker my-0 py-2.5">
+          <div className="ayre-ticker-track">
+            {[...allExperts, ...allExperts].map((snapshot, i) => (
+              <Link
+                key={`${snapshot.expert.id}-${i}`}
+                href={`/experts/${snapshot.expert.slug}`}
+                className="inline-flex items-center gap-2 px-6 font-mono text-[10px] uppercase tracking-[0.14em] text-[var(--muted)] transition hover:text-brand-green"
+              >
+                <span className="text-[var(--text)]">{snapshot.expert.displayName}</span>
+                <span className={snapshot.ayreScore >= 70 ? "font-bold text-brand-green" : snapshot.ayreScore <= 45 ? "text-brand-red" : ""}>
+                  {snapshot.ayreScore}
+                </span>
+                <span className="text-[var(--dim)]">•</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      {/* ── Leaderboard preview ── */}
+      <section className="animate-fade-up space-y-6" style={{ animationDelay: "0.1s" }}>
         <SectionHeading
           eyebrow="Leaderboard"
           title="Top scorecards"
-          description="The launch board ranks experts using the frozen v1.0 scoring config and always shows how many resolved predictions back the number."
+          description="Ranked by the frozen v1.0 scoring config. Sample size is always visible."
         />
         {topSection ? <LeaderboardTable section={topSection} limit={5} /> : null}
       </section>
 
-      <section className="space-y-6">
+      {/* ── Manifesto banner — COLOR BREAK ── */}
+      <section className="-mx-4 overflow-hidden rounded-none bg-[var(--text)] px-6 py-10 md:-mx-6 md:rounded-xl md:px-12 md:py-14">
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="font-serif text-[clamp(1.5rem,3.5vw,2.8rem)] italic leading-[1.2] text-[var(--bg)]">
+            &ldquo;Put your wrist on the line.<br />Or shut up.&rdquo;
+          </p>
+          <div className="mx-auto mt-6 h-px w-12 bg-brand-green" />
+          <p className="mt-6 font-mono text-[9px] uppercase tracking-[0.24em] text-[var(--dim)]">
+            LinkedIn = where you&apos;ve been. AYRE = what you knew.
+          </p>
+        </div>
+      </section>
+
+      {/* ── Featured experts — ASYMMETRIC GRID ── */}
+      <section className="animate-fade-up space-y-6" style={{ animationDelay: "0.15s" }}>
         <SectionHeading
-          eyebrow="Featured profiles"
-          title="Question-style calls to action"
-          description="The landing page keeps asking the same thing: is this person actually real, or just loud?"
+          eyebrow="Profiles"
+          title="Is this person actually real, or just loud?"
+          description="Featured scorecards. The question stays the same."
         />
-        <div className="grid gap-4 lg:grid-cols-3">
-          {featuredExperts.slice(0, 3).map((snapshot) => (
+        <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr] lg:grid-rows-2">
+          {featuredExperts.slice(0, 3).map((snapshot, i) => (
             <Link
               key={snapshot.expert.id}
               href={buildTrackedPath(`/experts/${snapshot.expert.slug}`, "expert", snapshot.expert.slug)}
-              className="ayre-panel group block p-5 transition hover:-translate-y-0.5 hover:border-white/20"
+              className={`ayre-panel group block p-5 transition hover:-translate-y-0.5 hover:shadow-lg ${
+                i === 0 ? "lg:row-span-2" : ""
+              }`}
             >
-              <div className="mb-4 flex items-start justify-between gap-4">
+              <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="font-display text-2xl uppercase text-white">{snapshot.expert.displayName}</p>
-                  <p className="text-sm text-white/60">{snapshot.expert.organization}</p>
+                  <p className="font-display text-base font-bold tracking-[-0.01em] text-[var(--text)]">{snapshot.expert.displayName}</p>
+                  <p className="text-xs text-[var(--muted)]">{snapshot.expert.organization}</p>
                 </div>
                 <ScoreChip snapshot={snapshot} compact />
               </div>
-              <p className="mb-5 text-sm text-white/65">{snapshot.expert.headline}</p>
-              <div className="rounded-2xl border border-white/10 bg-white/4 p-4">
-                <p className="mb-1 font-mono text-[11px] uppercase tracking-[0.28em] text-brand-green">Question CTA</p>
-                <p className="font-display text-3xl uppercase leading-none text-white">
+
+              <p className={`mt-3 text-xs leading-relaxed text-[var(--muted)] ${i === 0 ? "mb-6" : "mb-4"}`}>
+                {snapshot.expert.headline}
+              </p>
+
+              <div className={`rounded-lg border border-brand-green/10 bg-brand-green/[0.03] p-4 ${i === 0 ? "p-6" : ""}`}>
+                <p className={`font-extrabold leading-none tracking-[-0.03em] text-[var(--text)] ${
+                  i === 0 ? "font-serif text-3xl italic md:text-4xl" : "font-display text-xl"
+                }`}>
                   Is {snapshot.expert.displayName.split(" ")[0]} real?
                 </p>
-                <p className="mt-3 text-sm text-white/60">
-                  Check the scorecard. See the best call, the misses, and the exact source links.
+                <p className={`mt-2 text-[var(--muted)] ${i === 0 ? "text-sm" : "text-xs"}`}>
+                  {i === 0
+                    ? "See the full scorecard: best call, worst miss, every source link, and the exact score version."
+                    : "Check the scorecard and source links."
+                  }
                 </p>
               </div>
-              <div className="mt-4 flex items-center justify-between text-xs uppercase tracking-[0.28em] text-white/45">
-                <span>Score v{snapshot.scoreVersion.replace("v", "")}</span>
-                <span className="flex items-center gap-2 text-white/70">
-                  Open card
-                  <ArrowRight className="size-3.5" />
+
+              <div className="mt-3 flex items-center justify-between">
+                <span className="font-mono text-[7px] uppercase tracking-[0.16em] text-[var(--dim)]">v{snapshot.scoreVersion.replace("v", "")}</span>
+                <span className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.14em] text-[var(--muted)] transition group-hover:text-brand-green">
+                  Open
+                  <ArrowRight className="size-3 transition group-hover:translate-x-0.5" />
                 </span>
               </div>
             </Link>
@@ -124,38 +175,25 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-[1fr_1fr]">
+      {/* ── What a scorecard needs + sample call ── */}
+      <section className="animate-fade-up grid gap-8 lg:grid-cols-[1fr_1fr]" style={{ animationDelay: "0.2s" }}>
         <div className="space-y-6">
           <SectionHeading
-            eyebrow="What a scorecard needs"
+            eyebrow="Requirements"
             title="Claim, outcome, actionability"
-            description="Phase 1 is browse-only, but the board is already wired around verifiable calls and explicit deadlines."
+            description="The board is wired around verifiable calls and explicit deadlines."
           />
-          <div className="grid gap-3">
+          <div className="space-y-2">
             {[
-              {
-                icon: Radar,
-                title: "Claim has to be concrete",
-                body: "Conditional, vague, or deadline-free statements stay in the database as rejected and never touch the score.",
-              },
-              {
-                icon: BadgeInfo,
-                title: "Every score links back to evidence",
-                body: "Source links, evidence links, and score version labels are visible on every public profile.",
-              },
-              {
-                icon: Share2,
-                title: "Share cards carry provenance",
-                body: "Expert and compare cards include Score vX.Y so archived screenshots remain interpretable after later recalibration.",
-              },
+              { num: "01", title: "Concrete claims only", body: "Vague or deadline-free statements never touch the score." },
+              { num: "02", title: "Evidence-linked scores", body: "Source links and score version labels on every profile." },
+              { num: "03", title: "Provenance on shares", body: "Cards include Score vX.Y so archived screenshots stay interpretable." },
             ].map((item) => (
-              <div key={item.title} className="ayre-panel flex gap-4 p-5">
-                <div className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-white/8">
-                  <item.icon className="size-5 text-brand-green" />
-                </div>
-                <div className="space-y-1">
-                  <p className="font-display text-2xl uppercase text-white">{item.title}</p>
-                  <p className="text-sm text-white/65">{item.body}</p>
+              <div key={item.num} className="ayre-accent-left flex gap-4 rounded-lg border border-[var(--border)] bg-[var(--surface)] p-4 transition hover:border-brand-green/20 hover:shadow-sm">
+                <span className="font-mono text-[10px] font-bold text-brand-green">{item.num}</span>
+                <div>
+                  <p className="font-display text-sm font-bold tracking-[-0.01em] text-[var(--text)]">{item.title}</p>
+                  <p className="mt-0.5 text-xs leading-relaxed text-[var(--muted)]">{item.body}</p>
                 </div>
               </div>
             ))}
@@ -165,9 +203,9 @@ export default async function HomePage() {
         {featuredExperts[0]?.bestCall ? (
           <div className="space-y-6">
             <SectionHeading
-              eyebrow="Resolved call"
-              title="One card, one screenshot, one argument"
-              description={`Sample best call resolved on ${formatDate(featuredExperts[0].bestCall.resolution.resolvedAt)}.`}
+              eyebrow="Sample"
+              title="One card, one argument"
+              description={`Best call resolved ${formatDate(featuredExperts[0].bestCall.resolution.resolvedAt)}.`}
             />
             <ClaimCard record={featuredExperts[0].bestCall} />
           </div>

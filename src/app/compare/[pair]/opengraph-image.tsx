@@ -58,21 +58,20 @@ export default async function Image({ params }: CompareOgProps) {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          background:
-            "radial-gradient(circle at top left, rgba(0,214,143,0.22), transparent 30%), radial-gradient(circle at bottom right, rgba(247,73,109,0.2), transparent 28%), #060c12",
-          color: "white",
+          background: "#f8f7f4",
+          color: "#0f0f0f",
           padding: "44px",
           fontFamily: "sans-serif",
         }}
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-            <div style={{ fontSize: "18px", letterSpacing: "0.3em", textTransform: "uppercase", color: "#00d68f" }}>AYRE compare</div>
-            <div style={{ fontSize: "60px", textTransform: "uppercase", lineHeight: 1 }}>
+            <div style={{ fontSize: "18px", letterSpacing: "0.3em", textTransform: "uppercase", color: "#00a67e" }}>AYRE compare</div>
+            <div style={{ fontSize: "54px", textTransform: "uppercase", lineHeight: 1, color: "#0f0f0f" }}>
               {`${compare.left.expert.displayName} vs ${compare.right.expert.displayName}`}
             </div>
           </div>
-          <div style={{ fontSize: "18px", letterSpacing: "0.22em", textTransform: "uppercase", opacity: 0.52 }}>
+          <div style={{ fontSize: "16px", letterSpacing: "0.22em", textTransform: "uppercase", color: "#aeada6" }}>
             {`Score ${compare.scoreVersion}`}
           </div>
         </div>
@@ -86,47 +85,49 @@ export default async function Image({ params }: CompareOgProps) {
                 key={snapshot.expert.id}
                 style={{
                   flex: 1,
-                  borderRadius: "32px",
+                  borderRadius: "16px",
                   border: isWinner
-                    ? "1px solid rgba(0,214,143,0.45)"
+                    ? "2px solid #00a67e"
                     : isLoser
-                      ? "1px solid rgba(247,73,109,0.35)"
-                      : "1px solid rgba(255,255,255,0.1)",
+                      ? "1px solid rgba(212,54,75,0.2)"
+                      : "1px solid #d8d7d2",
                   background: isWinner
-                    ? "rgba(0,214,143,0.16)"
+                    ? "rgba(0,166,126,0.06)"
                     : isLoser
-                      ? "rgba(247,73,109,0.14)"
-                      : "rgba(255,255,255,0.04)",
+                      ? "rgba(212,54,75,0.03)"
+                      : "#ffffff",
                   padding: "28px",
                   display: "flex",
                   flexDirection: "column",
                   gap: "18px",
+                  opacity: isLoser ? 0.7 : 1,
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: "18px" }}>
                   <div
                     style={{
-                      width: "86px",
-                      height: "86px",
+                      width: "72px",
+                      height: "72px",
                       borderRadius: "999px",
-                      border: "1px solid rgba(255,255,255,0.12)",
-                      background: "rgba(255,255,255,0.07)",
+                      border: "1px solid #d8d7d2",
+                      background: "#efeeea",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      fontSize: "30px",
+                      fontSize: "26px",
+                      color: "#86857e",
                     }}
                   >
                     {initials(snapshot.expert.displayName)}
                   </div>
                   <div style={{ display: "flex", flexDirection: "column" }}>
-                    <span style={{ fontSize: "38px", textTransform: "uppercase", lineHeight: 1 }}>{snapshot.expert.displayName}</span>
-                    <span style={{ fontSize: "16px", opacity: 0.58 }}>{`Based on ${snapshot.resolvedCount} resolved predictions`}</span>
+                    <span style={{ fontSize: "34px", textTransform: "uppercase", lineHeight: 1, color: "#0f0f0f" }}>{snapshot.expert.displayName}</span>
+                    <span style={{ fontSize: "14px", color: "#86857e" }}>{`${snapshot.resolvedCount} resolved`}</span>
                   </div>
                 </div>
                 <div style={{ display: "flex", alignItems: "baseline", gap: "10px" }}>
-                  <span style={{ fontSize: "110px", lineHeight: 0.9 }}>{snapshot.ayreScore}</span>
-                  <span style={{ fontSize: "18px", letterSpacing: "0.18em", textTransform: "uppercase", opacity: 0.5 }}>AYRE Score</span>
+                  <span style={{ fontSize: "100px", lineHeight: 0.9, color: isWinner ? "#00a67e" : "#0f0f0f" }}>{snapshot.ayreScore}</span>
+                  <span style={{ fontSize: "16px", letterSpacing: "0.18em", textTransform: "uppercase", color: "#aeada6" }}>AYRE</span>
                 </div>
               </div>
             );
@@ -135,21 +136,30 @@ export default async function Image({ params }: CompareOgProps) {
 
         <div
           style={{
-            borderRadius: "28px",
-            border: "1px solid rgba(255,255,255,0.08)",
-            background: "rgba(255,255,255,0.05)",
-            padding: "22px 24px",
+            borderRadius: "12px",
+            border: "1px solid #d8d7d2",
+            background: "#ffffff",
+            padding: "20px 24px",
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
           }}
         >
           <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-            <span style={{ fontSize: "14px", letterSpacing: "0.24em", textTransform: "uppercase", opacity: 0.5 }}>Representative call</span>
-            <span style={{ fontSize: "34px", textTransform: "uppercase", lineHeight: 1.05 }}>{compare.representativeCall}</span>
+            <span style={{ fontSize: "12px", letterSpacing: "0.24em", textTransform: "uppercase", color: "#aeada6" }}>Representative call</span>
+            <span style={{ fontSize: "28px", lineHeight: 1.1, color: "#0f0f0f" }}>{compare.representativeCall}</span>
           </div>
-          <div style={{ fontSize: "22px", letterSpacing: "0.18em", textTransform: "uppercase", opacity: 0.68 }}>
-            {`Delta ${compare.scoreDelta}`}
+          <div
+            style={{
+              borderRadius: "999px",
+              background: "rgba(0,166,126,0.1)",
+              padding: "8px 16px",
+              fontSize: "16px",
+              color: "#00a67e",
+              letterSpacing: "0.1em",
+            }}
+          >
+            {`${compare.scoreDelta}pt delta`}
           </div>
         </div>
       </div>

@@ -15,52 +15,65 @@ export function CompareSummaryCard({
   const rightWinner = compare.winner === "right";
 
   return (
-    <div className="ayre-panel ayre-grid relative overflow-hidden p-6">
+    <div className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6">
       {priorityLabel ? (
-        <p className="mb-4 font-mono text-xs uppercase tracking-[0.32em] text-brand-green">{priorityLabel}</p>
+        <p className="mb-3 font-mono text-[9px] uppercase tracking-[0.22em] text-brand-green">{priorityLabel}</p>
       ) : null}
       <div className="space-y-5">
-        <div>
-          <p className="font-display text-4xl uppercase leading-none text-white">{compareTitle(compare)}</p>
-          <p className="mt-2 text-sm text-white/65">
-            Winner is readable in half a second: green accent for the higher score, red accent for the lower one.
-          </p>
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <p className="font-display text-2xl font-extrabold leading-[1.05] tracking-[-0.02em] text-[var(--text)] md:text-3xl">
+          {compareTitle(compare)}
+        </p>
+        <div className="grid gap-3 sm:grid-cols-2">
           {[compare.left, compare.right].map((snapshot, index) => {
             const winner = index === 0 ? leftWinner : rightWinner;
+            const loser = !winner && compare.winner !== "tie";
             return (
               <div
                 key={snapshot.expert.id}
-                className={`rounded-[1.4rem] border p-4 ${
-                  winner
-                    ? "border-brand-green/40 bg-brand-green/10"
-                    : compare.winner === "tie"
-                      ? "border-white/10 bg-white/5"
-                      : "border-brand-red/30 bg-brand-red/10"
+                className={`rounded-lg border p-4 transition ${
+                  winner ? "ayre-winner" : loser ? "ayre-loser" : "ayre-neutral"
                 }`}
               >
-                <p className="font-display text-2xl uppercase text-white">{snapshot.expert.displayName}</p>
-                <p className="mt-1 text-sm text-white/60">Based on {snapshot.resolvedCount} resolved predictions</p>
-                <div className="mt-5 flex items-end gap-3">
-                  <strong className="font-display text-6xl leading-none text-white">{snapshot.ayreScore}</strong>
-                  <span className="pb-1 font-mono text-xs uppercase tracking-[0.28em] text-white/45">Score v1.0</span>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="font-display text-sm font-bold tracking-[-0.01em] text-[var(--text)]">{snapshot.expert.displayName}</p>
+                    <p className="mt-0.5 text-[11px] text-[var(--muted)]">{snapshot.resolvedCount} resolved</p>
+                  </div>
+                  {winner ? (
+                    <span className="rounded-full bg-brand-green px-2 py-0.5 font-mono text-[7px] uppercase tracking-[0.14em] text-white">
+                      Winner
+                    </span>
+                  ) : null}
+                </div>
+                <div className="mt-4">
+                  <strong
+                    className={`ayre-score-hover inline-block font-display text-6xl font-extrabold leading-none tracking-[-0.05em] ${
+                      winner ? "text-brand-green" : loser ? "ayre-loser-score text-[var(--dim)]" : "text-[var(--text)]"
+                    }`}
+                  >
+                    {snapshot.ayreScore}
+                  </strong>
+                  <span className="ml-2 font-mono text-[8px] uppercase tracking-[0.16em] text-[var(--dim)]">v1.0</span>
                 </div>
               </div>
             );
           })}
         </div>
-        <div className="rounded-[1.2rem] border border-white/10 bg-white/3 p-4">
-          <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/45">Representative call</p>
-          <p className="mt-2 font-display text-2xl uppercase text-white">{compare.representativeCall}</p>
-          <p className="mt-2 text-sm text-white/60">Score delta: {compare.scoreDelta} points.</p>
+        <div className="rounded-lg border border-[var(--border)] bg-[var(--bg)] p-4">
+          <p className="font-mono text-[8px] uppercase tracking-[0.22em] text-[var(--dim)]">Representative call</p>
+          <p className="mt-1.5 font-serif text-lg italic text-[var(--text)]">{compare.representativeCall}</p>
+          <div className="mt-2 flex items-center gap-3">
+            <span className="inline-flex items-center rounded-full bg-brand-green/10 px-2.5 py-1 font-mono text-[10px] font-bold text-brand-green">
+              {compare.scoreDelta}pt delta
+            </span>
+          </div>
         </div>
         <Link
           href={`/compare/${compare.pair}`}
-          className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.28em] text-white/70"
+          className="ayre-link inline-flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.18em] text-[var(--muted)] transition hover:text-brand-green"
         >
-          Open compare card
-          <ArrowUpRight className="size-4" />
+          Full comparison
+          <ArrowUpRight className="size-3.5" />
         </Link>
       </div>
     </div>

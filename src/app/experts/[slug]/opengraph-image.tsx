@@ -46,6 +46,8 @@ export default async function Image({ params }: ExpertOgProps) {
     return new ImageResponse(<div>Missing expert</div>, size);
   }
 
+  const isGood = snapshot.ayreScore >= 70;
+
   return new ImageResponse(
     (
       <div
@@ -55,9 +57,8 @@ export default async function Image({ params }: ExpertOgProps) {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          background:
-            "radial-gradient(circle at top left, rgba(0,214,143,0.25), transparent 30%), radial-gradient(circle at bottom right, rgba(247,73,109,0.22), transparent 28%), #071018",
-          color: "white",
+          background: "#f8f7f4",
+          color: "#0f0f0f",
           padding: "48px",
           fontFamily: "sans-serif",
         }}
@@ -69,68 +70,69 @@ export default async function Image({ params }: ExpertOgProps) {
                 width: "92px",
                 height: "92px",
                 borderRadius: "999px",
-                background: "rgba(255,255,255,0.08)",
-                border: "1px solid rgba(255,255,255,0.14)",
+                background: "#efeeea",
+                border: "1px solid #d8d7d2",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 fontSize: "34px",
+                color: "#86857e",
               }}
             >
               {initials(snapshot.expert.displayName)}
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-              <div style={{ fontSize: "18px", letterSpacing: "0.28em", textTransform: "uppercase", color: "#00d68f" }}>AYRE</div>
-              <div style={{ fontSize: "58px", textTransform: "uppercase", lineHeight: 1 }}>{snapshot.expert.displayName}</div>
+              <div style={{ fontSize: "18px", letterSpacing: "0.28em", textTransform: "uppercase", color: "#00a67e" }}>AYRE</div>
+              <div style={{ fontSize: "58px", textTransform: "uppercase", lineHeight: 1, color: "#0f0f0f" }}>{snapshot.expert.displayName}</div>
             </div>
           </div>
           <div
             style={{
-              borderRadius: "28px",
-              border: "1px solid rgba(255,255,255,0.1)",
-              background: snapshot.ayreScore >= 70 ? "rgba(0,214,143,0.16)" : "rgba(255,255,255,0.06)",
+              borderRadius: "16px",
+              border: isGood ? "2px solid #00a67e" : "1px solid #d8d7d2",
+              background: isGood ? "rgba(0,166,126,0.06)" : "#ffffff",
               padding: "22px 26px",
               display: "flex",
               flexDirection: "column",
             }}
           >
-            <span style={{ fontSize: "14px", letterSpacing: "0.24em", textTransform: "uppercase", opacity: 0.6 }}>AYRE Score</span>
-            <span style={{ fontSize: "92px", lineHeight: 0.9 }}>{snapshot.ayreScore}</span>
+            <span style={{ fontSize: "14px", letterSpacing: "0.24em", textTransform: "uppercase", color: "#86857e" }}>AYRE Score</span>
+            <span style={{ fontSize: "92px", lineHeight: 0.9, color: isGood ? "#00a67e" : "#0f0f0f" }}>{snapshot.ayreScore}</span>
           </div>
         </div>
         <div style={{ display: "flex", gap: "24px" }}>
           <div
             style={{
               flex: 1,
-              borderRadius: "28px",
-              border: "1px solid rgba(255,255,255,0.08)",
-              background: "rgba(255,255,255,0.05)",
+              borderRadius: "16px",
+              border: "1px solid #d8d7d2",
+              background: "#ffffff",
               padding: "24px",
               display: "flex",
               flexDirection: "column",
               gap: "12px",
             }}
           >
-            <div style={{ fontSize: "14px", letterSpacing: "0.24em", textTransform: "uppercase", opacity: 0.5 }}>Best call</div>
-            <div style={{ fontSize: "34px", textTransform: "uppercase", lineHeight: 1.05 }}>
+            <div style={{ fontSize: "14px", letterSpacing: "0.24em", textTransform: "uppercase", color: "#86857e" }}>Best call</div>
+            <div style={{ fontSize: "34px", textTransform: "uppercase", lineHeight: 1.05, color: "#0f0f0f" }}>
               {snapshot.bestCall?.claim.eventLabel ?? "No resolved calls yet"}
             </div>
           </div>
           <div
             style={{
               width: "320px",
-              borderRadius: "28px",
-              border: "1px solid rgba(255,255,255,0.08)",
-              background: "rgba(255,255,255,0.05)",
+              borderRadius: "16px",
+              border: "1px solid #d8d7d2",
+              background: "#ffffff",
               padding: "24px",
               display: "flex",
               flexDirection: "column",
               justifyContent: "space-between",
             }}
           >
-            <div style={{ fontSize: "14px", letterSpacing: "0.24em", textTransform: "uppercase", opacity: 0.5 }}>Based on</div>
-            <div style={{ fontSize: "48px", lineHeight: 1 }}>{`${snapshot.resolvedCount} resolved predictions`}</div>
-            <div style={{ fontSize: "16px", letterSpacing: "0.2em", textTransform: "uppercase", opacity: 0.45 }}>
+            <div style={{ fontSize: "14px", letterSpacing: "0.24em", textTransform: "uppercase", color: "#86857e" }}>Based on</div>
+            <div style={{ fontSize: "48px", lineHeight: 1, color: "#0f0f0f" }}>{`${snapshot.resolvedCount} resolved predictions`}</div>
+            <div style={{ fontSize: "16px", letterSpacing: "0.2em", textTransform: "uppercase", color: "#aeada6" }}>
               {`Score ${snapshot.scoreVersion}`}
             </div>
           </div>

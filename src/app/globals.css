@@ -1,28 +1,32 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #060b10;
-  --bg-soft: #0d141c;
-  --panel: rgba(255, 255, 255, 0.04);
-  --panel-strong: rgba(255, 255, 255, 0.08);
-  --line: rgba(255, 255, 255, 0.1);
-  --line-strong: rgba(255, 255, 255, 0.18);
-  --text: #f3f7fb;
-  --muted: rgba(243, 247, 251, 0.68);
-  --brand-green: #00d68f;
-  --brand-green-soft: rgba(0, 214, 143, 0.14);
-  --brand-red: #f7496d;
-  --brand-red-soft: rgba(247, 73, 109, 0.14);
-  --brand-yellow: #ffca52;
+  --bg: #f8f7f4;
+  --bg-elevated: #efeeea;
+  --bg-sunken: #e5e4df;
+  --surface: #ffffff;
+  --border: #d8d7d2;
+  --border-hover: #b5b4ae;
+  --text: #0f0f0f;
+  --text-secondary: #3e3e3a;
+  --muted: #86857e;
+  --dim: #aeada6;
+  --brand-green: #00a67e;
+  --brand-green-soft: rgba(0, 166, 126, 0.08);
+  --brand-green-medium: rgba(0, 166, 126, 0.15);
+  --brand-red: #d4364b;
+  --brand-red-soft: rgba(212, 54, 75, 0.06);
+  --brand-yellow: #b8860b;
 }
 
 @theme inline {
   --color-app: var(--bg);
-  --color-panel: var(--panel);
-  --color-panel-strong: var(--panel-strong);
+  --color-elevated: var(--bg-elevated);
+  --color-surface: var(--surface);
   --color-brand-green: var(--brand-green);
   --color-brand-red: var(--brand-red);
   --font-display: var(--font-display);
+  --font-serif: var(--font-serif);
   --font-mono: var(--font-mono);
 }
 
@@ -31,16 +35,14 @@
 }
 
 html {
-  background:
-    radial-gradient(circle at top, rgba(0, 214, 143, 0.08), transparent 22%),
-    radial-gradient(circle at 85% 15%, rgba(247, 73, 109, 0.1), transparent 18%),
-    linear-gradient(180deg, #03070b, #060b10 32%, #081018);
+  background: var(--bg);
 }
 
 body {
   margin: 0;
   color: var(--text);
   font-family: var(--font-display), sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
 a {
@@ -55,86 +57,284 @@ select {
   font: inherit;
 }
 
+/* ── Panels ── */
 .ayre-panel {
-  border: 1px solid var(--line);
-  background: var(--panel);
-  backdrop-filter: blur(24px);
-  border-radius: 1.5rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 1rem;
+  transition: border-color 200ms ease, box-shadow 300ms ease, transform 200ms ease;
 }
 
+/* ── Buttons ── */
 .ayre-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.625rem;
-  border-radius: 999px;
-  padding: 0.95rem 1.2rem;
+  border-radius: 0.6rem;
+  padding: 0.85rem 1.5rem;
   font-family: var(--font-mono), monospace;
-  font-size: 0.8rem;
+  font-size: 0.72rem;
   text-transform: uppercase;
-  letter-spacing: 0.22em;
-  transition:
-    transform 160ms ease,
-    border-color 160ms ease,
-    background-color 160ms ease;
+  letter-spacing: 0.12em;
+  font-weight: 500;
+  transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.ayre-button::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0);
+  transition: background 200ms ease;
+}
+
+.ayre-button:hover::after {
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .ayre-button:hover {
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+}
+
+.ayre-button:active {
+  transform: translateY(0);
 }
 
 .ayre-button-primary {
-  border: 1px solid rgba(0, 214, 143, 0.4);
-  background: linear-gradient(180deg, rgba(0, 214, 143, 0.2), rgba(0, 214, 143, 0.12));
-  color: white;
+  border: none;
+  background: var(--text);
+  color: var(--bg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.ayre-button-primary:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
 }
 
 .ayre-button-secondary {
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.02);
+  border: 1.5px solid var(--text);
+  background: transparent;
   color: var(--text);
 }
 
+.ayre-button-secondary:hover {
+  background: var(--text);
+  color: var(--bg);
+}
+
+/* ── Stat blocks ── */
 .ayre-stat {
-  border-radius: 1.25rem;
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.02);
-  padding: 1rem;
+  border-radius: 0.6rem;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  padding: 0.75rem 0.85rem;
+  transition: border-color 200ms ease;
+}
+
+.ayre-stat:hover {
+  border-color: var(--border-hover);
 }
 
 .ayre-stat span {
   display: block;
   font-family: var(--font-mono), monospace;
-  font-size: 0.7rem;
-  letter-spacing: 0.28em;
+  font-size: 0.58rem;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: rgba(243, 247, 251, 0.45);
+  color: var(--muted);
 }
 
 .ayre-stat strong {
   display: block;
-  margin-top: 0.35rem;
-  font-size: 1.05rem;
-  font-weight: 500;
+  margin-top: 0.25rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
 }
 
-.ayre-grid {
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-  background-size: 26px 26px;
-}
-
+/* ── Inputs ── */
 .ayre-input {
   width: 100%;
-  border-radius: 1rem;
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.03);
-  color: white;
-  padding: 0.9rem 1rem;
+  border-radius: 0.6rem;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  padding: 0.85rem 1rem;
+  transition: border-color 200ms ease, box-shadow 200ms ease;
 }
 
 .ayre-input:focus {
-  outline: 2px solid rgba(0, 214, 143, 0.35);
-  outline-offset: 1px;
+  outline: none;
+  border-color: var(--brand-green);
+  box-shadow: 0 0 0 3px var(--brand-green-soft);
+}
+
+/* ── Winner/Loser cards ── */
+.ayre-winner {
+  border-color: var(--brand-green);
+  background: linear-gradient(145deg, rgba(0, 166, 126, 0.06), rgba(0, 166, 126, 0.01) 60%, transparent);
+  box-shadow: 0 0 0 1px var(--brand-green), inset 0 1px 0 rgba(0, 201, 138, 0.08);
+}
+
+.ayre-loser {
+  border-color: rgba(212, 54, 75, 0.18);
+  background: rgba(212, 54, 75, 0.02);
+  opacity: 0.75;
+}
+
+.ayre-neutral {
+  border-color: var(--border);
+  background: var(--bg);
+}
+
+/* ── Divider ── */
+.ayre-divider {
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── Animated link underline ── */
+.ayre-link {
+  position: relative;
+  display: inline-block;
+}
+
+.ayre-link::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--brand-green);
+  transition: width 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ayre-link:hover::after {
+  width: 100%;
+}
+
+/* ── Fade-up animation ── */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ── Score pulse on hover ── */
+@keyframes score-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+.ayre-score-hover:hover {
+  animation: score-pulse 0.4s ease;
+}
+
+/* ── Green accent bar ── */
+.ayre-accent-left {
+  position: relative;
+}
+
+.ayre-accent-left::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 3px;
+  background: var(--brand-green);
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+
+.ayre-accent-left:hover::before {
+  opacity: 1;
+}
+
+/* ── Scrolling ticker ── */
+@keyframes ticker-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.ayre-ticker {
+  overflow: hidden;
+  white-space: nowrap;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.ayre-ticker-track {
+  display: inline-flex;
+  animation: ticker-scroll 30s linear infinite;
+}
+
+.ayre-ticker:hover .ayre-ticker-track {
+  animation-play-state: paused;
+}
+
+/* ── Section ornament ── */
+.ayre-ornament {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ayre-ornament::before,
+.ayre-ornament::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── Hero gradient animation ── */
+@keyframes hero-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.ayre-hero-bg {
+  background: linear-gradient(
+    135deg,
+    var(--surface) 0%,
+    rgba(0, 166, 126, 0.04) 25%,
+    var(--surface) 50%,
+    rgba(0, 166, 126, 0.03) 75%,
+    var(--surface) 100%
+  );
+  background-size: 400% 400%;
+  animation: hero-shift 12s ease infinite;
+}
+
+/* ── Loser strikethrough ── */
+.ayre-loser-score {
+  position: relative;
+}
+
+.ayre-loser-score::after {
+  content: "";
+  position: absolute;
+  left: -4px;
+  right: -4px;
+  top: 50%;
+  height: 2px;
+  background: var(--brand-red);
+  opacity: 0.3;
+  transform: rotate(-5deg);
 }
