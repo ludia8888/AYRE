@@ -81,6 +81,8 @@ export default async function ExpertPage({ params }: ExpertPageProps) {
                 </div>
               </div>
               <div className="flex flex-wrap items-center gap-2 font-mono text-[9px] uppercase tracking-[0.14em] text-[var(--dim)]">
+                <a href={`/experts/${snapshot.expert.slug}/wrapped`} className="ayre-link font-bold text-brand-green transition hover:text-[var(--text)]">Wrapped card</a>
+                <span className="text-[var(--border)]">|</span>
                 <a href={buildTrackedPath(`/experts/${snapshot.expert.slug}`, "expert", snapshot.expert.slug)} className="ayre-link transition hover:text-brand-green">Share URL</a>
                 <span className="text-[var(--border)]">|</span>
                 <a href="/methodology" className="ayre-link transition hover:text-brand-green">Method</a>

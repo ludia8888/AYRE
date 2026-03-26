@@ -17,33 +17,38 @@ async function fetchFirestoreDataset(): Promise<SiteDataset | null> {
     return null;
   }
 
-  const [experts, sourceDocuments, claims, resolutions, scoringVersions, changelogEntries, correctionRequests] =
-    await Promise.all([
-      services.db.collection("experts").get(),
-      services.db.collection("source_documents").get(),
-      services.db.collection("claims").get(),
-      services.db.collection("resolutions").get(),
-      services.db.collection("scoring_versions").get(),
-      services.db.collection("methodology_changelog").get(),
-      services.db.collection("corrections").get(),
-    ]);
+  try {
+    const [experts, sourceDocuments, claims, resolutions, scoringVersions, changelogEntries, correctionRequests] =
+      await Promise.all([
+        services.db.collection("experts").get(),
+        services.db.collection("source_documents").get(),
+        services.db.collection("claims").get(),
+        services.db.collection("resolutions").get(),
+        services.db.collection("scoring_versions").get(),
+        services.db.collection("methodology_changelog").get(),
+        services.db.collection("corrections").get(),
+      ]);
 
-  const scoringVersionDocs = scoringVersions.docs.map((doc) => doc.data()) as SiteDataset["scoringVersions"];
-  const activeScoreVersion =
-    scoringVersionDocs.find((version) => version.status === "active") ?? mockSiteDataset.activeScoreVersion;
+    const scoringVersionDocs = scoringVersions.docs.map((doc) => doc.data()) as SiteDataset["scoringVersions"];
+    const activeScoreVersion =
+      scoringVersionDocs.find((version) => version.status === "active") ?? mockSiteDataset.activeScoreVersion;
 
-  return {
-    launchDate: activeScoreVersion.activatedAt,
-    activeScoreVersion,
-    scoringVersions: scoringVersionDocs,
-    experts: experts.docs.map((doc) => doc.data()) as SiteDataset["experts"],
-    sourceDocuments: sourceDocuments.docs.map((doc) => doc.data()) as SiteDataset["sourceDocuments"],
-    claims: claims.docs.map((doc) => doc.data()) as SiteDataset["claims"],
-    resolutions: resolutions.docs.map((doc) => doc.data()) as SiteDataset["resolutions"],
-    changelogEntries: changelogEntries.docs.map((doc) => doc.data()) as SiteDataset["changelogEntries"],
-    correctionRequests: correctionRequests.docs.map((doc) => doc.data()) as SiteDataset["correctionRequests"],
-    launchGates: mockSiteDataset.launchGates,
-  };
+    return {
+      launchDate: activeScoreVersion.activatedAt,
+      activeScoreVersion,
+      scoringVersions: scoringVersionDocs,
+      experts: experts.docs.map((doc) => doc.data()) as SiteDataset["experts"],
+      sourceDocuments: sourceDocuments.docs.map((doc) => doc.data()) as SiteDataset["sourceDocuments"],
+      claims: claims.docs.map((doc) => doc.data()) as SiteDataset["claims"],
+      resolutions: resolutions.docs.map((doc) => doc.data()) as SiteDataset["resolutions"],
+      changelogEntries: changelogEntries.docs.map((doc) => doc.data()) as SiteDataset["changelogEntries"],
+      correctionRequests: correctionRequests.docs.map((doc) => doc.data()) as SiteDataset["correctionRequests"],
+      launchGates: mockSiteDataset.launchGates,
+    };
+  } catch (error) {
+    console.error("[AYRE] Firestore fetch failed, falling back to mock data:", error instanceof Error ? error.message : error);
+    return null;
+  }
 }
 
 export async function getSiteDataset() {
