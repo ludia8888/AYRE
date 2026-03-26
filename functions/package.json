@@ -1,6 +1,7 @@
 {
   "name": "ayre-firebase-functions",
   "private": true,
+  "main": "lib/index.js",
   "engines": {
     "node": "22"
   },
